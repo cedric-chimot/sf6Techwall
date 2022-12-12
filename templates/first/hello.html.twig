@@ -8,7 +8,8 @@
     </head>
     <body>
         <div>
-            <h1>Hello {{name}} {{firstname}} !</h1>
+            <p>Aujourd'hui nous sommes le {{ "now" | date("m/d/Y") }}, </p>
+            <h1>Bonjour {{ name | capitalize }} {{ firstname | capitalize }} !</h1>
         </div>
     </body>
 </html>
