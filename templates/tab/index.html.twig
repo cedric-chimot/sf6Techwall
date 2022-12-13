@@ -1,13 +1,14 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <link rel="stylesheet" href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.css') }}">
-        <title>Table</title>
-    </head>
-    <body>
+{% extends "template.html.twig" %}
+
+{% block title %}
+    Stats
+{% endblock %}
+
+{% block PageTitle %}
+    Stats
+{% endblock %}
+
+{% block body %}
 
         <table class="table">
         
@@ -29,5 +30,4 @@
 
         </div>
 
-    </body>
-</html>
+{% endblock %}

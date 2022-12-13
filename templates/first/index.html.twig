@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>{{ firstname }} {{ name }}</title>
-    </head>
-    <body>
-        <div>
-            <h1>De la part de {{ firstname }} {{ name }}</h1>
-           <p>Bonjour Techwall sf6 !</p> 
-        </div>
-    </body>
-</html>
+{% extends "template.html.twig" %}
+
+{% block title %}
+    {{ firstname }} {{ name }}
+{% endblock %}
+
+{% block body %}
+    <h1>De la part de {{ firstname }} {{ name }}</h1>
+    <p>Bonjour Techwall sf6 !</p>
+    Mon url absolue est : {{ url('first') }}
+{% endblock %}
+    

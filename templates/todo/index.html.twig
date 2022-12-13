@@ -1,41 +1,23 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <link rel="stylesheet" href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.css') }}">
-        <title>To do</title>
-    </head>
-    <body>
+{% extends "template.html.twig" %}
 
-        {% for message in app.session.flashbag.get('info') %}
-            <div class="alert alert-info">
-                {{message}}
-            </div>
-        {% endfor %}
+{% block body %}
 
-        {% for message in app.session.flashbag.get('success') %}
-            <div class="alert alert-success">
-                {{message}}
-            </div>
-        {% endfor %}
+    {% block PageTitle %}
+        Liste des Todos
+    {% endblock %}
 
-        {% for message in app.session.flashbag.get('error') %}
-            <div class="alert alert-danger">
-                {{message}}
-            </div>
-        {% endfor %}
+    <ol class="list-group">
+        
+        {% for name,content in app.session.get('todos') %}
+            <li class="list-group-item">
+                {{ name }} : {{ content }}
+            </li>
+        {% endfor  %}
 
-        <h1>Liste des Todos</h1>
-        <ol class="list-group">
-            
-            {% for name,content in app.session.get('todos') %}
-                <li class="list-group-item">
-                    {{ name }} : {{ content }}
-                </li>
-            {% endfor  %}
+    </ol>
+    
+{% endblock %}
 
-        </ol>
-    </body>
-</html>
+{% block title %}
+    Todo
+{% endblock %}

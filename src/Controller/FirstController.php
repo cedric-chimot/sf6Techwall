@@ -9,6 +9,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class FirstController extends AbstractController
 {
 
+    #[Route('/template', name: 'template')]
+    public function template() {
+        return $this->render('template.html.twig');
+    }
+
     #[Route('/order/{maVar}', name: 'test.order.route')]
     public function testOrderRoute($maVar) {
         return new Response("
@@ -16,17 +21,17 @@ class FirstController extends AbstractController
         ");
     }
 
-    #[Route('/first', name: 'app_first')]
+    #[Route('/first', name: 'first')]
     public function index(): Response
     {
         return $this->render('first/index.html.twig', [
             'name' => 'Chimot',
-            'firstname' => 'Cedric'
+            'firstname' => 'Cedric',
         ]);
     }
 
-    #[Route('/sayHello/{name}/{firstname}', name: 'say.hello')]
-    public function hello($name, $firstname): Response
+    // #[Route('/sayHello/{name}/{firstname}', name: 'say.hello')]
+    public function sayHello($name, $firstname): Response
     {
         return $this->render('first/hello.html.twig', [
             'name' => $name,
