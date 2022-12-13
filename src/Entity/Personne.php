@@ -22,6 +22,9 @@ class Personne
     #[ORM\Column]
     private ?int $age = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $job = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -62,4 +65,17 @@ class Personne
 
         return $this;
     }
+
+    public function getJob(): ?string
+    {
+        return $this->job;
+    }
+
+    public function setJob(?string $job): self
+    {
+        $this->job = $job;
+
+        return $this;
+    }
+
 }
