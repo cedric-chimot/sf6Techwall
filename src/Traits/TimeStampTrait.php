@@ -9,12 +9,12 @@ trait TimeStampTrait
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $createdAt;
+    private ?\DateTimeImmutable $createdAt = null;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $updatedAt;
+    private ?\DateTimeInterface $updatedAt = null;
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
@@ -43,15 +43,20 @@ trait TimeStampTrait
     /**
      * @ORM\PrePersist()
      */
-    public function onPrePersist() {
-        $this->createdAt = new \DateTime();
-        $this->updatedAt = new \DateTime();
+    public function prePersist() {
+        if (!$this->getCreatedAt()){
+            $this->createdAt = new \DateTimeImmutable();
+        }
+
+        if (!$this->getupdatedAt()){
+            $this->updatedAt = new \DateTime();
+        }
     }
 
     /**
      * @ORM\PreUpdate()
      */
-    public function onPreUpdate() {
+    public function preUpdate() {
         $this->updatedAt = new \DateTime();
     }
 

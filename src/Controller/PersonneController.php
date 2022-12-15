@@ -84,29 +84,50 @@ class PersonneController extends AbstractController
         return $this->render('personne/detail.html.twig', ['personne' => $personne]);
     }
 
-    #[Route('/add', name: 'personne.add')]
-    public function addPersonne(ManagerRegistry $doctrine): Response
+    #[Route('/edit/{id?0}', name: 'personne.edit')]
+    public function addPersonne(
+        Personne $personne = null,
+        ManagerRegistry $doctrine,
+        Request $request
+    ): Response
     {
-        $entityManager = $doctrine->getManager();
-        $personne = new Personne();
-        $personne->setFirstname('Cédric');
-        $personne->setName('Chimot');
-        $personne->setAge('41');
-        // $personne2 = new Personne();
-        // $personne2->setFirstname('Tony');
-        // $personne2->setName('Stark');
-        // $personne2->setAge('51');
+        $new = false;
+        if (!$personne){
+            $new = true;
+            //$personne est l'image de notre formulaire
+            $personne = new Personne();
+        }
+        
+        $form = $this->createForm(PersonneType::class, $personne);
+        $form->remove('createdAt');
+        $form->remove('updatedAt');
 
-        //ajouter l'opération d'insertion de la personne dans ma transaction
-        $entityManager->persist($personne);
-        // $entityManager->persist($personne2);
+        //mon formulaire va aller traiter la requête
+        $form->handleRequest($request);
 
-        //exécute la transaction Todo
-        $entityManager->flush();
+        //est-ce que le formulaire a été  soumis ?
+        if ($form->isSubmitted()){
+            //si oui on va ajouter l'objet personne dans la BDD
+            $manager = $doctrine->getManager();
+            $manager->persist($personne);
 
-        return $this->render('personne/detail.html.twig', [
-            'personne' => $personne,
-        ]);
+            $manager->flush();
+            //afficher un message de succès
+            if ($new) {
+                $message = " a été ajouté avec succès !";
+            } else {
+                $message = " a été mis à jour avec succès !";
+            }
+            $this->addFlash('success', $personne->getFirstname() . " " . $personne->getName() . $message);
+            //rediriger vers la liste des personnes
+            return $this->redirectToRoute('personne.list');
+        } else {
+            //sinon on affiche le formulaire
+            return $this->render('personne/add-personne.html.twig', [
+                'form' => $form->createView()
+            ]);
+        }
+            
     }
 
     #[Route('/delete/{id}', name: 'personne.delete')]

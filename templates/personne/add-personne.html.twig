@@ -1,0 +1,29 @@
+{% extends 'template.html.twig' %}
+
+{% block body %}
+    {# Fonction pour afficher le formulaire #}
+    {# 'Form_start' : afficher le formulaire selon la présentation choisie #}
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}})}}
+    <div class="row">
+        <div class="col">{{ form_row(form.firstname) }}</div>
+        <div class="col">{{ form_row(form.name) }}</div>
+    </div>
+    {# 'Form_rest' : afficher les champs manquants du formulaire selon la présentation Bootstrap #}
+    {{ form_rest(form) }}
+{% endblock %}
+
+{% block title %}
+    Editer une personne
+{% endblock %}
+
+{% block PageTitle %}
+    Editer une personne
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2();
+        });
+    </script>
+{% endblock %}
