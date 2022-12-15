@@ -2,11 +2,27 @@
 
 namespace App\Controller;
 
+
+use doctrine;
 use App\Entity\Personne;
+use App\Service\Helpers;
+use App\Form\PersonneType;
+use App\Service\PdfService;
+use Psr\Log\LoggerInterface;
+use App\Service\MailerService;
+use App\Event\AddPersonneEvent;
+use App\Service\UploaderService;
+use App\Event\ListAllPersonnesEvent;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Route('personne')]
 class PersonneController extends AbstractController
@@ -20,13 +36,39 @@ class PersonneController extends AbstractController
         return $this->render('personne/index.html.twig', ['personnes' => $personnes]);
     }
 
+    // #[Route('/alls/age/{ageMin}/{ageMax}', name: 'personne.list.age')]
+    // public function personnesByAge(ManagerRegistry $doctrine, $ageMin, $ageMax): Response {
+
+    //     $repository = $doctrine->getRepository(Personne::class);
+    //     $personnes = $repository->findPersonnesByAgeInterval($ageMin, $ageMax);
+    //     return $this->render('personne/index.html.twig', ['personnes' => $personnes]);
+    // }
+    
+    #[Route('/stats/age/{ageMin}/{ageMax}', name: 'personne.list.age')]
+    public function statsPersonnesByAge(ManagerRegistry $doctrine, $ageMin, $ageMax): Response {
+        $repository = $doctrine->getRepository(Personne::class);
+        $stats = $repository->statsPersonnesByAgeInterval($ageMin, $ageMax);
+        return $this->render('personne/stats.html.twig', [
+            'stats' => $stats[0],
+            'ageMin'=> $ageMin,
+            'ageMax' => $ageMax]
+        );
+    }
+
     #[Route('/alls/{page?1}/{nbre?12}', name: 'personne.list.alls')]
     public function indexAlls(ManagerRegistry $doctrine, $page, $nbre): Response
     {
         $repository = $doctrine->getRepository(Personne::class);
-        //p = 4 & nbre = 10 => 30
-        $personnes = $repository->findBy([], [], $nbre, ($page - 1) * 10);
-        return $this->render('personne/index.html.twig', ['personnes' => $personnes]);
+        $nbPersonne = $repository->count([]);
+        $nbPage = ceil($nbPersonne / $nbre);
+        $personnes = $repository->findBy([], [], $nbre, ($page - 1) * $nbre);
+        return $this->render('personne/index.html.twig', [
+            'personnes' => $personnes,
+            'isPaginated' => true,
+            'nbPages' => $nbPage,
+            'page' => $page,
+            'nbre' => $nbre
+        ]);
     }
 
     #[Route('/{id<\d+>}', name: 'personne.detail')]
@@ -65,5 +107,43 @@ class PersonneController extends AbstractController
         return $this->render('personne/detail.html.twig', [
             'personne' => $personne,
         ]);
+    }
+
+    #[Route('/delete/{id}', name: 'personne.delete')]
+    public function deletePersonne(Personne $personne = null, ManagerRegistry $doctrine): RedirectResponse {
+        //récupérer la personne
+        //si la personne existe => le supprimer et retourner un message de succès
+        if($personne){
+            $manager = $doctrine->getManager();
+            //ajoute la fonction de suppression dans la transaction
+            $manager->remove($personne);
+            //exécute la transaction
+            $manager->flush();
+            $this->addFlash('success', 'La personne a été supprimée correctement !');
+        } else {
+            //sinon on renvoie un message d'erreur
+            $this->addFlash('error', 'Personne innexistante !');
+        }
+        return $this->redirectToRoute('personne.list.alls');
+    }
+
+    #[Route('/update/{id}/{name}/{firstname}/{age}', name: 'personne.update')]
+    public function updatePersonne(Personne $personne = null, ManagerRegistry $doctrine, $name, $firstname, $age){
+        //vérifier que la personne existe
+        if($personne){
+            //si la personne existe => mettre à jour la personne et message de succès
+            $personne->setName($name);
+            $personne->setFirstname($firstname);
+            $personne->setage($age);
+            $manager = $doctrine->getManager();
+            $manager->persist($personne);
+
+            $manager->flush();
+            $this->addFlash('success', 'La personne a été modifiée correctement !');
+        } else {
+            //sinon => déclencher un message d'erreur
+            $this->addFlash('error', 'Personne innexistante !');
+        }
+        return $this->redirectToRoute('personne.list.alls');        
     }
 }

@@ -19,10 +19,52 @@
                 <a href="{{ path('personne.detail', {id: personne.id}) }}" class="card-link">
                     <i class="fas fa-info-circle"></i>
                 </a>
+                <a href="{{ path('personne.delete', {id: personne.id}) }}" class="card-link">
+                    Delete
+                </a>
             </div>
         </div>
 
         {% endfor %}
     </div>
+
+{# si la pagination est définie et sa valeur est 'true' #}
+    {% if isPaginated is defined and isPaginated %}
+
+    <div class="row mt-3">
+        <nav aria-label="col Page navigation example">
+                <ul class="pagination">
+                {# Affichage du bouton 'previous' si la page en cours n'est pas la 1ère page #}
+                    {% if page != 1 %}
+                        <li class="page-item">
+                            <a
+                                    class="page-link"
+                                    href="{{ path('personne.list.alls', {page: page - 1, nbre: nbre}) }}"
+                            >
+                                Previous
+                            </a></li>
+                    {% endif %}
+                    {% for i in range(1, nbPages) %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="{{ path('personne.list.alls', {page: i, nbre: nbre}) }}"
+                            >{{ i }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                {# même chose sur le bouton 'next' si on est sur la dernière page #}
+                    {% if page != nbPages %}
+                        <li class="page-item">
+                            <a
+                                    class="page-link"
+                                    href="{{ path('personne.list.alls', {page: page + 1, nbre: nbre}) }}"
+                            >Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+    </div>
+
+    {% endif %}
 
 {% endblock %}

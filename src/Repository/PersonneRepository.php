@@ -4,11 +4,10 @@ namespace App\Repository;
 
 use App\Entity\Personne;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Personne>
- *
  * @method Personne|null find($id, $lockMode = null, $lockVersion = null)
  * @method Personne|null findOneBy(array $criteria, array $orderBy = null)
  * @method Personne[]    findAll()
@@ -21,46 +20,40 @@ class PersonneRepository extends ServiceEntityRepository
         parent::__construct($registry, Personne::class);
     }
 
-    public function save(Personne $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
+    // /**
+    //  * @return Personne[] Returns an array of Personne objects
+    //  */
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+    public function findPersonnesByAgeInterval($ageMin, $ageMax)
+    {
+          $qb = $this->createQueryBuilder('p');
+          $qb = $this->createQueryBuilder('p');
+          return $qb->getQuery()->getResult();
     }
 
-    public function remove(Personne $entity, bool $flush = false): void
+    public function statsPersonnesByAgeInterval($ageMin, $ageMax)
     {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+         $qb = $this->createQueryBuilder('p')
+            ->select('avg(p.age) as ageMoyen, count(p.id) as nombrePersonne');
+         $this->addIntervalAge($qb, $ageMin, $ageMax);
+         return $qb->getQuery()->getScalarResult();
     }
 
-//    /**
-//     * @return Personne[] Returns an array of Personne objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Personne
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    private function addIntervalAge(QueryBuilder $qb, $ageMin, $ageMax) {
+        $qb->andWhere('p.age >= :ageMin and p.age <= :ageMax')
+//            ->setParameter('ageMin', $ageMin)
+//            ->setParameter('ageMax', $ageMax)
+            ->setParameters(['ageMin'=>$ageMin, 'ageMax' => $ageMax]);
+    }
+    /*
+    public function findOneBySomeField($value): ?Personne
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.exampleField = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    */
 }
