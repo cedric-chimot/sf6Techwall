@@ -6,6 +6,7 @@ use App\Traits\TimeStampTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PersonneRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -22,9 +23,13 @@ class Personne
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message:"Veuillez renseigner ce champs !")]
+    #[Assert\Length(min:4, minMessage:"Ce champs doit comporter au moins 4 caractères !")]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message:"Veuillez renseigner ce champs !")]
+    #[Assert\Length(min:4, minMessage:"Ce champs doit comporter au moins 4 caractères !")]
     private ?string $name = null;
 
     #[ORM\Column]
@@ -38,6 +43,12 @@ class Personne
 
     #[ORM\ManyToOne(inversedBy: 'personnes')]
     private ?Job $job = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
+    #[ORM\ManyToOne(inversedBy: 'personnes')]
+    private ?User $createdBy = null;
 
     public function __construct()
     {
@@ -129,6 +140,30 @@ class Personne
     public function setJob(?Job $job): self
     {
         $this->job = $job;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): self
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }
